@@ -1,5 +1,5 @@
 ---
-title: Home
+title: go-tsvsheet
 ---
 
 **The [tsvsheet](https://github.com/tsvsheet/tsvsheet) engine as an importable Go library.** A `.tsvt` file _is_ a spreadsheet — a single TAB-separated grid whose cells are literal values or `=formulas` that address other cells in A1 notation (`B2`, `D2:D5`), computed in place. `go-tsvsheet` parses that grid, evaluates every formula in dependency order, and hands you the computed values — with no filesystem or network access unless you inject it.
