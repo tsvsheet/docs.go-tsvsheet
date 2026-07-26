@@ -46,7 +46,7 @@ A `.tsvt` is the whole spreadsheet: one grid, each cell a literal or an `=formul
 
 ### Pipes — shell-style formula composition
 
-Formulas can compose like a pipeline: `expr | fn(arg, …)` is sugar for the call with the piped expression as its first argument — `=A1 | round(2)` is exactly `=round(A1, 2)`, and `=A2:A10 | sort() | unique() | count()` folds left into the composed calls. The engine desugars the pipe at parse time (SPECIFICATION §5.4), so evaluation, `Check`, `Explain`, and the dependency graph see only ordinary function application — there is no second execution path — while rendering (`Explain` traces, structural edits) preserves the author's pipe spelling.
+Formulas can compose like a pipeline: `expr | fn(arg, …)` is sugar for the call with the piped expression as its first argument — `=A1 | round(2)` is exactly `=round(A1, 2)`, and `=A2:A10 | sort | unique | count` folds left into the composed calls. The engine desugars the pipe at parse time (SPECIFICATION §5.4), so evaluation, `Check`, `Explain`, and the dependency graph see only ordinary function application — there is no second execution path — while rendering (`Explain` traces, structural edits) preserves the author's pipe spelling.
 
 ## Core API
 
