@@ -76,7 +76,7 @@ A document also carries the **view** its `#.` directives declare — which rows 
 - **`Document.View() (View, []Diagnostic)`** — the view resolved against the document's own extent, plus a finding for any directive that cannot be read. Every `count(…)` and from-the-end offset is already substituted, so a host renders positions rather than re-deriving them.
 - **`Document.Extent() Extent`** — the grid's size in rows and columns.
 - **`View`** — six `Selection` sets (`HiddenRows`, `HiddenCols`, `HeaderRows`, `HeaderCols`, `FreezeRows`, `FreezeCols`), each a set of 1-based positions.
-- **`IsCommentLine(at LineNumber, text SourceLine) bool`** — the language's own answer to what a comment is, for a frontend mapping document lines to grid rows. Call it rather than testing the prefixes: `#!` shebangs the first line, `#.` marks a comment or directive anywhere, `# ` is the legacy form, and everything else is data.
+- **`IsCommentLine(at LineNumber, text SourceLine) bool`** — the language's own answer to what a comment is, for a frontend mapping document lines to grid rows. Call it rather than testing the prefixes: `#!` shebangs the first line, `#.` marks a comment or directive anywhere, `#`-space is the legacy form, and everything else is data.
 
 Structural edits keep the declarations true: an absolute span shifts with the grid, a `count(…)` block resizes when an edit lands inside it, and an untouched directive line comes back byte-identical.
 
