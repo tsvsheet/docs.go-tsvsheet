@@ -63,13 +63,22 @@ Formulas can compose like a pipeline: `expr | fn(arg, …)` is sugar for the cal
 
 ### The document layer — comments and shebang round-trip
 
-`Parse` reads the grid; **`ParseDocument(src []byte) (Document, error)`** reads the whole file, additionally recording its physical line layout. A `Document` is a `Sheet` plus that layout, so full-line comments (`# …`) and a `#!` shebang — which the grid drops — survive editing and are written back in position:
+`Parse` reads the grid; **`ParseDocument(src []byte) (Document, error)`** reads the whole file, additionally recording its physical line layout. A `Document` is a `Sheet` plus that layout, so comment lines (`#. …`) and a `#!` shebang — which the grid drops — survive editing and are written back in position:
 
 - **`Document.Sheet() Sheet`** — the parsed sheet the document wraps.
 - **`Document.Text() []byte`** — serialize the document canonically: lines in layout order, comments verbatim, grid rows tab-joined, every line newline-terminated. For input already in canonical form, `ParseDocument` followed by `Text` is byte-identity.
 - **`Document.SetCell`**, **`InsertRow`/`DeleteRow`/`InsertCol`/`DeleteCol`** — the structural edits at the document level; each returns a new `Document` with the layout kept in step.
 
-`Text` is the one sanctioned way to serialize a sheet back to disk — writing a grid out by hand loses every comment line and the shebang. Like `Sheet`, `Document` is immutable: every editing operation returns a new `Document`.
+`Text` is the one sanctioned way to serialize a sheet back to disk — writing a grid out by hand loses every comment line, the shebang, and the sheet's declared view. Like `Sheet`, `Document` is immutable: every editing operation returns a new `Document`.
+
+A document also carries the **view** its `#.` directives declare — which rows and columns are hidden, carry headers, or stay pinned:
+
+- **`Document.View() (View, []Diagnostic)`** — the view resolved against the document's own extent, plus a finding for any directive that cannot be read. Every `count(…)` and from-the-end offset is already substituted, so a host renders positions rather than re-deriving them.
+- **`Document.Extent() Extent`** — the grid's size in rows and columns.
+- **`View`** — six `Selection` sets (`HiddenRows`, `HiddenCols`, `HeaderRows`, `HeaderCols`, `FreezeRows`, `FreezeCols`), each a set of 1-based positions.
+- **`IsCommentLine(at LineNumber, text SourceLine) bool`** — the language's own answer to what a comment is, for a frontend mapping document lines to grid rows. Call it rather than testing the prefixes: `#!` shebangs the first line, `#.` marks a comment or directive anywhere, `# ` is the legacy form, and everything else is data.
+
+Structural edits keep the declarations true: an absolute span shifts with the grid, a `count(…)` block resizes when an edit lands inside it, and an untouched directive line comes back byte-identical.
 
 ### Standalone expressions — the engine without a sheet
 
