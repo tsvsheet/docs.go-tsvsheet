@@ -42,7 +42,7 @@ func main() {
 
 ## The model
 
-A `.tsvt` is the whole spreadsheet: one grid, each cell a literal or an `=formula`. Formulas address other cells in A1 notation — a single cell (`B2`), a range (`D2:D5`), or, when you inject a loader, a cross-sheet reference (`"prices"!A1`). The expression sublanguage is Excel-faithful: `^` (power), `&` (concatenation), postfix `%`, `TRUE`/`FALSE`, error-value literals, and a broad function library. Because the file is plain TSV, a sheet versions as text and diffs line by line. The language itself is specified in the [tsvsheet](https://github.com/tsvsheet/tsvsheet) repo.
+A `.tsvt` is the whole spreadsheet: one grid, each cell a literal or an `=formula`. Formulas address other cells in A1 notation — a single cell (`B2`), a range (`D2:D5`), or, when you inject a loader, a cross-sheet reference (`"prices"!A1`). The expression sublanguage is Excel's, with six deliberate departures: `^` (power), `&` (concatenation), postfix `%`, `TRUE`/`FALSE`, error-value literals, and a broad function library. Where it departs — `^` binds tighter than a unary sign and associates rightward, text is never coerced into arithmetic or a comparison, text compares by case, and a boolean is 1 or 0 rather than sorting above every number — `Check` reports it on the cell, naming what Excel would do, so a difference is something you are told rather than something you discover from a surprising number. Because the file is plain TSV, a sheet versions as text and diffs line by line. The language itself is specified in the [tsvsheet](https://github.com/tsvsheet/tsvsheet) repo.
 
 ### Pipes — shell-style formula composition
 
