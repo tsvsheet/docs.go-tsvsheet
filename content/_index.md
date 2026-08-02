@@ -96,7 +96,7 @@ The engine touches neither the filesystem nor the network on its own. Cross-file
 
 - **`Loader`** — resolves `SHEET("file")` / `"file"!A1` cross-sheet references. Without a loader, those cells resolve to `#REF!`. You control the base directory and containment.
 - **`Fetcher`** — resolves content-typed `IMPORT*` cells (fetching values from an endpoint that speaks the tsvsheet media type). A `nil` fetcher disables imports (every `IMPORT*` is `#IMPORT!`). The concrete HTTP fetcher, allowlist, and caching live in the host program, not the engine.
-- **`Limits`** — bounds every allocation (array-result cells, string bytes, grid dimensions) so an untrusted sheet cannot exhaust memory. `DefaultLimits()` is generous for a workstation; `BrowserLimits()` is sized for a WASM tab.
+- **`Limits`** — bounds every allocation so an untrusted sheet cannot exhaust memory: the cells one written reference may span (`SpanCells`), the cells and bytes one formula result may produce (`ResultCells`, `ResultBytes`), and the grid dimension an edit may reach (`GridDim`). An over-budget reference or result computes to `#LIMIT!` — refused from its corners or dimensions alone, so the refusal costs nothing. `DefaultLimits()` is generous for a workstation; `BrowserLimits()` is sized for a WASM tab; a `SpanCells` of zero falls back to `ResultCells`, so a single-ceiling constructor keeps its intent.
 
 ```go
 grid := sheet.ComputeWith(tsvsheet.ComputeOptions{
@@ -111,7 +111,7 @@ grid := sheet.ComputeWith(tsvsheet.ComputeOptions{
 
 Two distinct kinds of error:
 
-- **Spreadsheet error _values_** — a cell that fails to evaluate carries an `ErrorValue`: `#REF!`, `#VALUE!`, `#NAME?`, `#DIV/0!`, `#CIRC!`, `#N/A`, `#NUM!`, `#NULL!`, `#SPILL!`, `#IMPORT!`. These propagate through formulas as data; they are not Go errors.
+- **Spreadsheet error _values_** — a cell that fails to evaluate carries an `ErrorValue`: `#REF!`, `#VALUE!`, `#NAME?`, `#DIV/0!`, `#CIRC!`, `#N/A`, `#NUM!`, `#NULL!`, `#SPILL!`, `#IMPORT!`, `#LIMIT!`. These propagate through formulas as data; they are not Go errors.
 - **Go error _sentinels_** — functions return `errs.Const` sentinels matchable with `errors.Is`: `ErrSyntax` (a malformed formula), `ErrInvalidValue`, `ErrReadInput`, `ErrWriteFile`, `ErrNotFound`.
 
 ## Design
